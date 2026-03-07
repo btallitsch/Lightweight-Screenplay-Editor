@@ -181,3 +181,27 @@
 .editor-page::-webkit-scrollbar { width: 6px; }
 .editor-page::-webkit-scrollbar-track { background: transparent; }
 .editor-page::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.screenplay-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+.screenplay-page {
+  width: 816px;
+  height: 1056px;
+  background: white;
+  padding: 96px 96px 96px 144px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+
+  font-family: "Courier Prime", Courier, monospace;
+  font-size: 12pt;
+  line-height: 1.6;
+}
+
+.screenplay-line {
+  white-space: pre;
+  height: 1.6em;
+}
