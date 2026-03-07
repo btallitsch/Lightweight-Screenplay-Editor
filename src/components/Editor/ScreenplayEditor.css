@@ -50,6 +50,7 @@
   position: relative;
   width: 680px;
   min-height: 900px;
+  height: auto;
 }
 
 /* ─── Textarea ─────────────────────────────────────────────────────────────── */
@@ -85,7 +86,7 @@
   font-family: var(--font-screen);
   font-size: 12pt;
   line-height: 1.6;
-  overflow: hidden;
+  overflow: visible;
   box-sizing: border-box;
   z-index: 1;
   white-space: pre-wrap;
