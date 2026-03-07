@@ -2,7 +2,6 @@
  * PaceMeter.tsx — Visual pacing graph for scene rhythm analysis
  */
 import './PaceMeter.css';
-import type { PaceDataPoint } from '../../types/screenplay';
 import { analyzePacing, getOverallStats } from '../../utils/paceAnalyzer';
 import type { Scene } from '../../types/screenplay';
 

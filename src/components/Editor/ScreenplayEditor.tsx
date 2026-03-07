@@ -1,6 +1,5 @@
 /**
  * ScreenplayEditor.tsx — The main WYSIWYG editing canvas
- * Renders formatted screenplay elements from a contenteditable textarea.
  */
 import { useRef, useEffect, useCallback, type ChangeEvent } from 'react';
 import type { ScreenplayElement } from '../../types/screenplay';
@@ -22,7 +21,7 @@ export function ScreenplayEditor({ content, elements, onChange, isolatedSceneInd
     onChange(e.target.value);
   }, [onChange]);
 
-  // Track cursor position to detect current scene
+  // Track cursor to detect current scene
   const handleCursorMove = useCallback(() => {
     const ta = textareaRef.current;
     if (!ta) return;
@@ -34,14 +33,14 @@ export function ScreenplayEditor({ content, elements, onChange, isolatedSceneInd
     if (el?.sceneIndex !== undefined) onSceneChange(el.sceneIndex);
   }, [elements, onSceneChange]);
 
-  // Sync textarea & overlay scroll
+  // Sync overlay scroll with textarea scroll
   const syncScroll = useCallback(() => {
     if (overlayRef.current && textareaRef.current) {
       overlayRef.current.scrollTop = textareaRef.current.scrollTop;
     }
   }, []);
 
-  // Tab key inserts spaces
+  // Tab key → spaces
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -56,26 +55,21 @@ export function ScreenplayEditor({ content, elements, onChange, isolatedSceneInd
     }
   }, [onChange]);
 
-  // Filter elements for isolated scene
+  // Keep uncontrolled textarea in sync when content changes externally
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    if (ta.value !== content) {
+      const pos = ta.selectionStart;
+      ta.value = content;
+      ta.selectionStart = pos;
+      ta.selectionEnd = pos;
+    }
+  }, [content]);
+
   const visibleElements = isolatedSceneIndex !== null
     ? elements.filter(e => e.sceneIndex === isolatedSceneIndex)
     : elements;
-
-  const visibleContent = isolatedSceneIndex !== null
-    ? visibleElements.map(e => e.rawText).join('\n')
-    : content;
-
-  useEffect(() => {
-    if (textareaRef.current && isolatedSceneIndex === null) {
-      // keep textarea value in sync when content changes externally
-      if (textareaRef.current.value !== content) {
-        const pos = textareaRef.current.selectionStart;
-        textareaRef.current.value = content;
-        textareaRef.current.selectionStart = pos;
-        textareaRef.current.selectionEnd = pos;
-      }
-    }
-  }, [content, isolatedSceneIndex]);
 
   return (
     <div className="screenplay-editor">
@@ -91,21 +85,17 @@ export function ScreenplayEditor({ content, elements, onChange, isolatedSceneInd
       <div className="editor-page">
         <div className="editor-inner">
           {/* Syntax highlight overlay */}
-          <div
-            ref={overlayRef}
-            className="highlight-overlay"
-            aria-hidden="true"
-          >
+          <div ref={overlayRef} className="highlight-overlay" aria-hidden="true">
             {visibleElements.map((el) => (
               <ElementLine key={el.id} element={el} />
             ))}
           </div>
 
-          {/* Editable textarea */}
+          {/* Editable textarea — uncontrolled for perf, synced via useEffect */}
           <textarea
             ref={textareaRef}
             className="editor-textarea"
-            defaultValue={visibleContent}
+            defaultValue={content}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             onKeyUp={handleCursorMove}
@@ -122,11 +112,9 @@ export function ScreenplayEditor({ content, elements, onChange, isolatedSceneInd
   );
 }
 
-// ─── Single Element Line ──────────────────────────────────────────────────────
 function ElementLine({ element }: { element: ScreenplayElement }) {
-  const cls = `el el-${element.type}`;
   if (element.type === 'empty') {
     return <div className="el el-empty">&nbsp;</div>;
   }
-  return <div className={cls}>{element.rawText || '\u00A0'}</div>;
+  return <div className={`el el-${element.type}`}>{element.rawText || '\u00A0'}</div>;
 }
