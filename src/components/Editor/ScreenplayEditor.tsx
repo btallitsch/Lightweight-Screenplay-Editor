@@ -3,6 +3,7 @@
  */
 
 import { useRef, useEffect, useCallback, type ChangeEvent } from 'react';
+import { calculatePageCount } from '../../utils/pagination';
 import type { ScreenplayElement } from '../../types/screenplay';
 import './ScreenplayEditor.css';
 
@@ -24,6 +25,8 @@ export function ScreenplayEditor({
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const lineCount = content.split('\n').length;
+  const pageCount = calculatePageCount(lineCount);
 
   /**
    * Auto-resize textarea to match content height
@@ -167,8 +170,12 @@ export function ScreenplayEditor({
         </div>
       )}
 
-      <div className="editor-page">
+      <div className="editor-pages">
 
+        {Array.from({ length: pageCount }).map((_, i) => (
+          <div key={i} className="screenplay-page" />
+        ))}
+      
         <div className="editor-inner">
 
           {/* Syntax highlight overlay */}
@@ -204,6 +211,7 @@ export function ScreenplayEditor({
           />
 
         </div>
+      </div>
 
       </div>
 
