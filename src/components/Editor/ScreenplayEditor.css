@@ -1,0 +1,178 @@
+/* ── Scroll container ──────────────────────────────────────────────────────── */
+.se-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.se-scroll-container::-webkit-scrollbar { width: 8px; }
+.se-scroll-container::-webkit-scrollbar-track { background: #1e1e1e; }
+.se-scroll-container::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+
+/* ── Isolation banner ──────────────────────────────────────────────────────── */
+.se-isolation-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  background: var(--accent-amber);
+  color: #0d0d0d;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.se-isolation-exit {
+  background: none; border: 1px solid #0d0d0d;
+  color: #0d0d0d; font-family: var(--font-ui); font-size: 10px;
+  font-weight: 700; padding: 3px 10px; cursor: pointer;
+  letter-spacing: 0.06em; text-transform: uppercase; border-radius: 2px;
+  transition: all 0.12s;
+}
+.se-isolation-exit:hover { background: #0d0d0d; color: var(--accent-amber); }
+
+/* ── Pages wrapper (relative container for textarea overlay) ──────────────── */
+.se-pages-wrapper {
+  position: relative;
+  width: 760px;
+  margin: 32px auto 80px;
+}
+
+/* ── Pages render layer ────────────────────────────────────────────────────── */
+.se-pages {
+  pointer-events: none;
+  user-select: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Single page ───────────────────────────────────────────────────────────── */
+.se-page {
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.2);
+  position: relative;
+  width: 760px;
+}
+
+/* Top margin area — 1 inch = ~96px */
+.se-page-top-margin {
+  height: 96px;
+  padding: 16px 96px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  box-sizing: border-box;
+}
+.se-page-num-top {
+  font-family: var(--font-screen);
+  font-size: 12pt;
+  color: #555;
+}
+
+/* Script content area — 56 lines × 21px */
+.se-page-content {
+  padding: 0 96px;
+  min-height: 1176px; /* 56 × 21px */
+  box-sizing: border-box;
+  font-family: var(--font-screen);
+  font-size: 12pt;
+  line-height: 21px;
+  color: transparent; /* hidden — textarea shows actual text */
+}
+
+/* Filler keeps page full height */
+.se-page-filler { flex: 1; }
+
+/* Bottom margin */
+.se-page-bottom-margin {
+  height: 96px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 16px;
+}
+.se-continued {
+  font-family: var(--font-screen);
+  font-size: 10pt;
+  color: #aaa;
+  letter-spacing: 0.05em;
+}
+
+/* Page break separator between pages */
+.se-page-break {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0;
+  background: transparent;
+}
+.se-break-line { flex: 1; height: 1px; background: rgba(255,255,255,0.12); }
+.se-break-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── Full-height textarea overlay ─────────────────────────────────────────── */
+.se-textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: var(--font-screen);
+  font-size: 12pt;
+  line-height: 21px;
+  color: #1a1a1a;
+  caret-color: #111;
+  z-index: 2;
+  box-sizing: border-box;
+  /* Match the page padding stack:
+     Each page = 96px top + 1176px content + 96px bottom = 1368px
+     Plus 40px page-break gap between pages (20px top + 20px bottom padding)
+  */
+  padding-top: 96px;  /* first page top margin */
+  padding-left: 96px;
+  padding-right: 96px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: hidden;
+}
+
+/* ── Syntax highlight layer: element colors ────────────────────────────────── */
+.hl {
+  display: block;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 21px;
+  font-family: var(--font-screen);
+  font-size: 12pt;
+  color: transparent; /* hidden under textarea — shown only in highlight mode */
+}
+
+/* Element-specific indent & style to match the textarea's visual rendering */
+.hl-scene_heading {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: transparent;
+}
+.hl-character    { padding-left: 22ch; text-transform: uppercase; font-weight: 700; color: transparent; }
+.hl-dialogue     { padding-left: 10ch; max-width: 35ch; color: transparent; }
+.hl-parenthetical{ padding-left: 15ch; font-style: italic; color: transparent; }
+.hl-transition   { text-align: right; text-transform: uppercase; font-weight: 600; color: transparent; }
+.hl-empty        { color: transparent; }
+.hl-page_break   { text-align: center; color: transparent; }

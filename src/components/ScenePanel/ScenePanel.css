@@ -1,0 +1,181 @@
+.scene-panel {
+  width: 224px;
+  min-width: 224px;
+  background: var(--bg-mid);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Tabs ──────────────────────────────────────────────────────────────────── */
+.panel-tabs {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  height: 40px;
+}
+.panel-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  height: 100%;
+  transition: all 0.12s;
+}
+.panel-tab:hover { color: var(--text-secondary); }
+.panel-tab.active {
+  color: var(--accent-amber);
+  border-bottom-color: var(--accent-amber);
+}
+
+/* New doc button in tab bar */
+.new-doc-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  border-left: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 12px;
+  height: 100%;
+  letter-spacing: 0.04em;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+.new-doc-btn:hover {
+  color: var(--accent-amber);
+  background: var(--accent-dim);
+}
+
+/* ── Panel content ─────────────────────────────────────────────────────────── */
+.panel-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Scene list ────────────────────────────────────────────────────────────── */
+.scene-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+.scene-list::-webkit-scrollbar { width: 3px; }
+.scene-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+.empty-hint {
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+  padding: 16px; line-height: 1.7;
+}
+.empty-hint code { color: var(--accent-amber); font-size: 10px; }
+
+.scene-item {
+  display: flex;
+  align-items: stretch;
+  border-left: 2px solid transparent;
+  transition: all 0.1s;
+}
+.scene-item:hover { background: var(--bg-hover); }
+.scene-item.active { border-left-color: var(--accent-amber); background: rgba(245,200,66,0.04); }
+.scene-item.isolated { background: rgba(245,200,66,0.08); }
+
+.scene-btn {
+  flex: 1; display: flex; align-items: center; gap: 7px;
+  background: none; border: none; padding: 7px 10px 7px 12px;
+  cursor: pointer; text-align: left;
+}
+.scene-num { display: flex; flex-direction: column; align-items: center; min-width: 26px; }
+.int-ext { font-family: var(--font-mono); font-size: 8px; color: var(--accent-amber); letter-spacing: 0.1em; }
+.scene-idx { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+.scene-info { flex: 1; display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
+.scene-location {
+  font-family: var(--font-ui); font-size: 11px; font-weight: 600;
+  color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden;
+  white-space: nowrap; text-transform: uppercase; letter-spacing: 0.02em;
+}
+.scene-time { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); text-transform: uppercase; }
+.pages-stat { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); white-space: nowrap; }
+
+.isolate-btn {
+  background: none; border: none; color: var(--text-muted);
+  cursor: pointer; padding: 0 9px; font-size: 13px;
+  opacity: 0; transition: all 0.1s;
+}
+.scene-item:hover .isolate-btn { opacity: 1; }
+.isolate-btn.on { opacity: 1; color: var(--accent-amber); }
+
+/* ── Docs list ─────────────────────────────────────────────────────────────── */
+.doc-list { flex: 1; overflow-y: auto; padding: 6px 0; }
+.doc-list::-webkit-scrollbar { width: 3px; }
+.doc-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+.doc-item {
+  display: flex;
+  align-items: center;
+  border-left: 2px solid transparent;
+  transition: all 0.1s;
+  padding-right: 6px;
+}
+.doc-item:hover { background: var(--bg-hover); }
+.doc-item.active { border-left-color: var(--accent-amber); background: rgba(245,200,66,0.04); }
+
+.doc-title-btn {
+  flex: 1; display: flex; align-items: center; gap: 7px;
+  background: none; border: none; padding: 9px 8px 9px 12px;
+  cursor: pointer; text-align: left; min-width: 0;
+}
+.doc-icon { font-size: 12px; flex-shrink: 0; }
+.doc-name {
+  font-family: var(--font-ui); font-size: 11px; font-weight: 500;
+  color: var(--text-secondary); text-overflow: ellipsis;
+  overflow: hidden; white-space: nowrap;
+}
+
+.doc-rename-input {
+  flex: 1; background: var(--bg-hover); border: 1px solid var(--accent-amber);
+  color: var(--text-primary); font-family: var(--font-ui); font-size: 11px;
+  padding: 5px 8px; outline: none; margin: 4px; border-radius: 3px;
+}
+
+.doc-actions { display: flex; gap: 2px; flex-shrink: 0; opacity: 0; transition: opacity 0.1s; }
+.doc-item:hover .doc-actions { opacity: 1; }
+.doc-action-btn {
+  background: none; border: none; color: var(--text-muted); font-size: 11px;
+  cursor: pointer; padding: 4px 5px; border-radius: 3px; transition: all 0.1s;
+}
+.doc-action-btn:hover { background: var(--bg-hover); color: var(--text-secondary); }
+.doc-action-btn.danger:hover { color: #f87171; }
+
+/* ── Footer ────────────────────────────────────────────────────────────────── */
+.panel-footer { padding: 10px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+.exit-isolation {
+  width: 100%; background: rgba(245,200,66,0.1); border: 1px solid var(--accent-amber);
+  color: var(--accent-amber); font-family: var(--font-ui); font-size: 11px;
+  font-weight: 600; padding: 7px; cursor: pointer; border-radius: 3px;
+  transition: all 0.15s; letter-spacing: 0.04em;
+}
+.exit-isolation:hover { background: var(--accent-amber); color: var(--bg-dark); }
+
+.new-doc-full-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;
+  background: var(--bg-hover); border: 1px solid var(--border);
+  color: var(--text-secondary); font-family: var(--font-ui); font-size: 11px;
+  font-weight: 600; padding: 8px; cursor: pointer; border-radius: 3px;
+  transition: all 0.15s; letter-spacing: 0.04em;
+}
+.new-doc-full-btn:hover { border-color: var(--accent-amber); color: var(--accent-amber); background: var(--accent-dim); }
