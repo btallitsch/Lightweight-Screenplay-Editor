@@ -65,6 +65,14 @@ export function classifyLine(raw: string, ctx: Ctx, lineNum: number): Screenplay
   if (SYNOPSIS_RE.test(t)) return mk('synopsis', t.slice(2));
   if (SCENE_HEADING_FORCED_RE.test(t) && !t.startsWith('...'))
     return mk('scene_heading', t.slice(1).trim().toUpperCase(), true);
+
+  // Forced character with @ prefix (Fountain spec)
+  if (t.startsWith('@'))
+    return mk('character', t.slice(1).trim().toUpperCase(), true);
+
+  // Forced action with ! prefix
+  if (t.startsWith('!'))
+    return mk('action', t.slice(1).trim(), true);
   if (SCENE_HEADING_RE.test(t)) return mk('scene_heading', t.toUpperCase());
   if (t.startsWith('>') && !t.endsWith('<'))
     return mk('transition', t.slice(1).trim().toUpperCase(), true);

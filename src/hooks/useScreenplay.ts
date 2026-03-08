@@ -1,5 +1,5 @@
 /**
- * useScreenplay.ts — Core screenplay state built around an active document
+ * useScreenplay.ts — Core screenplay state
  */
 import { useState, useCallback, useMemo } from 'react';
 import { parseScreenplay } from '../parsers/fountainParser';
@@ -12,7 +12,7 @@ export interface UseScreenplayReturn {
   updateTitle: (title: string) => void;
   isolateScene: (sceneIndex: number | null) => void;
   setCurrentScene: (sceneIndex: number | null) => void;
-  forceElementType: (targetLineNum: number, content: string, type: ElementType) => string;
+  forceElementType: (lineNum: number, content: string, type: ElementType) => string;
   markSaved: () => void;
 }
 
@@ -22,15 +22,15 @@ export function useScreenplay(
   onContentChange: (c: string) => void,
   onTitleChange: (t: string) => void,
 ): UseScreenplayReturn {
-  const [isDirty, setIsDirty] = useState(false);
-  const [lastSaved, setLastSaved] = useState<number | null>(null);
-  const [isolatedSceneIndex, setIsolatedSceneIndex] = useState<number | null>(null);
-  const [currentSceneIndex, setCurrentSceneIndex] = useState<number | null>(null);
+  const [isDirty, setIsDirty]             = useState(false);
+  const [lastSaved, setLastSaved]         = useState<number | null>(null);
+  const [isolatedSceneIndex, setIsolated] = useState<number | null>(null);
+  const [currentSceneIndex, setScene]     = useState<number | null>(null);
 
   const parsed = useMemo(() => parseScreenplay(content), [content]);
 
-  const updateContent = useCallback((newContent: string) => {
-    onContentChange(newContent);
+  const updateContent = useCallback((c: string) => {
+    onContentChange(c);
     setIsDirty(true);
   }, [onContentChange]);
 
@@ -39,37 +39,58 @@ export function useScreenplay(
     setIsDirty(true);
   }, [onTitleChange]);
 
-  const isolateScene = useCallback((idx: number | null) => {
-    setIsolatedSceneIndex(idx);
-  }, []);
-
   const markSaved = useCallback(() => {
     setIsDirty(false);
     setLastSaved(Date.now());
   }, []);
 
   /**
-   * Force a specific line to be a given element type by inserting
-   * Fountain prefix syntax that overrides auto-detection.
+   * forceElementType: inserts/removes Fountain forced-type prefixes on a line.
+   * Fountain forced syntax:
+   *   . prefix  → scene_heading
+   *   @ prefix  → character
+   *   > prefix  → transition
+   *   ! prefix  → action (strips any other prefix)
+   *   (text)    → parenthetical
+   *   [[text]]  → note
    */
-  const forceElementType = useCallback((
-    targetLineNum: number,
-    currentContent: string,
-    type: ElementType,
-  ): string => {
+  const forceElementType = useCallback((lineNum: number, currentContent: string, type: ElementType): string => {
     const lines = currentContent.split('\n');
-    const line = lines[targetLineNum] ?? '';
-    const bare = line.replace(/^[.!@~>]/, '').trim();
+    if (lineNum < 0 || lineNum >= lines.length) return currentContent;
 
-    const prefixMap: Partial<Record<ElementType, (t: string) => string>> = {
-      scene_heading:  (t) => `.${t}`,
-      transition:     (t) => `>${t}`,
-      action:         (t) => `!${t}`,
-      // character, dialogue, parenthetical rely on context — no forced prefix in Fountain
-    };
+    // Strip any existing forced prefix
+    const bare = lines[lineNum].replace(/^[@.>!]\s*/, '').trim();
 
-    const transform = prefixMap[type];
-    lines[targetLineNum] = transform ? transform(bare) : bare;
+    switch (type) {
+      case 'scene_heading':
+        lines[lineNum] = '.' + bare;
+        break;
+      case 'character':
+        lines[lineNum] = '@' + bare.toUpperCase();
+        break;
+      case 'transition':
+        lines[lineNum] = '>' + bare;
+        break;
+      case 'action':
+        // If it's already plain (no prefix), nothing to do
+        // If it had a forced prefix, bare already stripped it
+        lines[lineNum] = bare || lines[lineNum];
+        break;
+      case 'parenthetical':
+        lines[lineNum] = bare.startsWith('(') ? bare : `(${bare})`;
+        break;
+      case 'note':
+        lines[lineNum] = bare.startsWith('[[') ? bare : `[[${bare}]]`;
+        break;
+      case 'dialogue':
+        // Fountain has no forced dialogue prefix — just strip forced prefixes
+        // so the context (follows character name) can classify it
+        lines[lineNum] = bare;
+        break;
+      default:
+        lines[lineNum] = bare;
+    }
+
     return lines.join('\n');
   }, []);
 
@@ -77,25 +98,21 @@ export function useScreenplay(
     title,
     author: '',
     content,
-    elements: parsed.elements,
-    scenes: parsed.scenes,
+    elements:          parsed.elements,
+    scenes:            parsed.scenes,
     currentSceneIndex,
     isolatedSceneIndex,
-    cursorLine: 0,
-    wordCount: parsed.wordCount,
-    pageCount: parsed.pageCount,
+    cursorLine:        0,
+    wordCount:         parsed.wordCount,
+    pageCount:         parsed.pageCount,
     isDirty,
     lastSaved,
   };
 
   return {
-    state,
-    titleData: parsed.titleData,
-    updateContent,
-    updateTitle,
-    isolateScene,
-    setCurrentScene: setCurrentSceneIndex,
-    forceElementType,
-    markSaved,
+    state, titleData: parsed.titleData,
+    updateContent, updateTitle,
+    isolateScene: setIsolated, setCurrentScene: setScene,
+    forceElementType, markSaved,
   };
 }

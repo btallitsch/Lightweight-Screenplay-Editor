@@ -1,7 +1,9 @@
 /**
- * useEditorCursor.ts — Tracks cursor position and current element type
+ * useEditorCursor.ts
+ * Tracks cursor line and resolves the ScreenplayElement type at that line.
+ * Uses array index (not lineNumber property) so it's robust in isolation mode.
  */
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import type { ElementType, ScreenplayElement } from '../types/screenplay';
 
 export interface CursorState {
@@ -11,30 +13,38 @@ export interface CursorState {
   elementId: string | null;
 }
 
-export function useEditorCursor(elements: ScreenplayElement[]) {
+export function useEditorCursor(elements: ScreenplayElement[], isolatedSceneIndex: number | null) {
   const [cursor, setCursor] = useState<CursorState>({
     line: 0, col: 0, elementType: 'action', elementId: null,
   });
-  const lastLineRef = useRef<number>(-1);
 
-  const updateFromTextarea = useCallback((textarea: HTMLTextAreaElement) => {
-    const pos = textarea.selectionStart;
-    const textBefore = textarea.value.slice(0, pos);
-    const lineNum = textBefore.split('\n').length - 1;
-    const col = pos - textBefore.lastIndexOf('\n') - 1;
+  const updateFromTextarea = useCallback((ta: HTMLTextAreaElement) => {
+    const pos    = ta.selectionStart;
+    const before = ta.value.slice(0, pos);
+    const lineIdx = before.split('\n').length - 1;
+    const col     = pos - before.lastIndexOf('\n') - 1;
 
-    if (lineNum === lastLineRef.current) return; // no line change
-    lastLineRef.current = lineNum;
+    // Resolve against the elements visible in the textarea
+    // In isolation mode, elements are filtered — so index into the filtered array
+    const visible = isolatedSceneIndex !== null
+      ? elements.filter(e => e.sceneIndex === isolatedSceneIndex)
+      : elements;
 
-    // Find the element at this line
-    const el = [...elements].reverse().find(e => e.lineNumber <= lineNum);
-    setCursor({
-      line: lineNum,
-      col,
-      elementType: el?.type ?? 'action',
-      elementId: el?.id ?? null,
+    // Clamp to valid range
+    const el = visible[Math.min(lineIdx, visible.length - 1)];
+
+    setCursor(prev => {
+      const next: CursorState = {
+        line: lineIdx,
+        col,
+        elementType: el?.type ?? 'action',
+        elementId: el?.id ?? null,
+      };
+      // Avoid re-render if nothing changed
+      if (prev.line === next.line && prev.elementType === next.elementType) return prev;
+      return next;
     });
-  }, [elements]);
+  }, [elements, isolatedSceneIndex]);
 
   return { cursor, updateFromTextarea };
 }
