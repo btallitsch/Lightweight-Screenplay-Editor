@@ -47,34 +47,45 @@
 }
 
 .editor-inner {
-  position: relative;
-  width: 680px;
-  min-height: 900px;
-  height: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 816px;
+
+  padding:
+    96px   /* top */
+    96px   /* right */
+    96px   /* bottom */
+    144px; /* left */
+
+  font-family: "Courier Prime", Courier, monospace;
+  font-size: 12pt;
+  line-height: 1.6;
 }
 
 /* ─── Textarea ─────────────────────────────────────────────────────────────── */
 .editor-textarea {
   position: absolute;
   inset: 0;
+
   width: 100%;
-  height: 100%;
-  min-height: 900px;
-  padding: 64px 80px;
+  height: auto;
+
   background: transparent;
+
+  color: transparent;
+  caret-color: black;
+
   border: none;
   outline: none;
   resize: none;
-  font-family: var(--font-screen);
-  font-size: 12pt;
-  line-height: 1.6;
-  color: transparent;
-  caret-color: var(--text-primary);
-  overflow: visible;
-  box-sizing: border-box;
-  z-index: 2;
-  white-space: pre-wrap;
-  word-wrap: break-word;
+
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+
+  white-space: pre;
 }
 
 /* ─── Highlight Overlay ────────────────────────────────────────────────────── */
@@ -205,4 +216,23 @@
 .screenplay-line {
   white-space: pre;
   height: 1.6em;
+}
+
+.editor-pages {
+  position: relative;
+  width: 816px;
+  margin: 0 auto;
+}
+
+.screenplay-page {
+  width: 816px;
+  height: 1056px;
+
+  background: white;
+
+  margin-bottom: 40px;
+
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+
+  border-radius: 2px;
 }
